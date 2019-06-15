@@ -17,6 +17,10 @@ $ yarn start
 
 # generate static project
 $ yarn run generate
+
+# deploy GitHub Pages
+$ yarn run generate:gh-pages
+$ yarn run deploy
 ```
 
 For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).
