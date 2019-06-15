@@ -1,34 +1,84 @@
 <template>
   <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        inversecooking-app
-      </h1>
-      <h2 class="subtitle">
-        料理画像からレシピを生成するアプリ
-      </h2>
-      <div class="links">
-        <a href="https://nuxtjs.org/" target="_blank" class="button--green"
-          >Documentation</a
-        >
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-          >GitHub</a
-        >
+    <h1 class="title">料理画像からレシピを生成するAI</h1>
+    <el-upload
+      class="upload-demo"
+      drag
+      name="image"
+      accept="image/*"
+      action="http://28.122.83.34.bc.googleusercontent.com/"
+      :before-upload="handleBeforeUpload"
+      :on-success="handleSuccess"
+      :hidden="uploadHidden"
+    >
+      <i class="el-icon-upload"></i>
+      <div class="el-upload__text">画像を入れるか <em>選択する</em></div>
+      <div slot="tip" class="el-upload__tip">
+        レシピを生成する料理の画像を入れてね
       </div>
+    </el-upload>
+    <el-progress
+      type="circle"
+      :percentage="progress"
+      :style="{ display: progressHidden ? 'none' : 'inline-block' }"
+    ></el-progress>
+    <p :hidden="progressHidden">レシピを生成中</p>
+    <el-image
+      v-if="!thumbnailHidden"
+      style="max-width: 480px; max-height: 480px; border-radius: 4px"
+      :src="thumbnail"
+      fit="contain"
+    ></el-image>
+    <div v-for="(recipi, index) in recipis" :key="index" style="margin: 8px">
+      <h3>料理名: {{ recipi.outs.title }}</h3>
+      <p>材料: {{ recipi.outs.ingrs.join(', ') }}</p>
+      <ol style="margin: 4px; text-align: left">
+        <li v-for="(r, i) in recipi.outs.recipe" :key="i">{{ r }}</li>
+      </ol>
     </div>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-
 export default {
-  components: {
-    Logo
+  components: {},
+  data() {
+    return {
+      progress: 0,
+      uploadHidden: false,
+      progressHidden: true,
+      recipis: [],
+      thumbnail: null,
+      thumbnailHidden: true
+    }
+  },
+  methods: {
+    handleBeforeUpload(file) {
+      this.uploadHidden = true
+      this.progressHidden = false
+      const duration = 24
+      const timer = setInterval(() => {
+        if (this.progress >= 100) clearInterval(timer)
+        else this.progress += 100 / duration
+        this.progress = Math.floor(this.progress)
+      }, 1000)
+
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        this.thumbnail = reader.result
+      }
+      if (file) {
+        reader.readAsDataURL(file)
+      } else {
+        this.thumbnail = null
+      }
+    },
+    handleSuccess(recipis) {
+      this.progressHidden = true
+      this.thumbnailHidden = false
+      this.recipis = recipis
+      debugger
+    }
   }
 }
 </script>
@@ -40,6 +90,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   text-align: center;
 }
 
@@ -48,8 +99,7 @@ export default {
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
   font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
+  margin: 32px;
   letter-spacing: 1px;
 }
 
@@ -63,5 +113,9 @@ export default {
 
 .links {
   padding-top: 15px;
+}
+
+.upload-demo {
+  margin: 32px;
 }
 </style>
