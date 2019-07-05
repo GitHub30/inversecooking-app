@@ -1,13 +1,14 @@
 <template>
   <div class="container">
     <h1 class="title">料理画像からレシピを生成するAI</h1>
+    <h2>クラウド破産回避のためサービスを終了しました。</h2>
     <el-upload
       class="upload-demo"
       drag
       name="image"
       accept="image/*"
       action="http://28.122.83.34.bc.googleusercontent.com/"
-      :before-upload="handleBeforeUpload"
+      :before-upload="finishService"
       :on-success="handleSuccess"
       :hidden="uploadHidden"
     >
@@ -78,6 +79,9 @@ export default {
       this.thumbnailHidden = false
       this.recipis = recipis
       debugger
+    },
+    finishService() {
+      alert(document.querySelector('h2').textContent)
     }
   }
 }
